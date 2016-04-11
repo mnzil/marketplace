@@ -16,6 +16,8 @@ from oscar.defaults import *
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from oscar import get_core_apps
 
+location = lambda x : os.path.join(os.path.dirname(os.path.realpath(__file__)), x)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
