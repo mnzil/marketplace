@@ -1,0 +1,21 @@
+# Python bytecode:
+*.py[co]
+
+# Packaging files:
+*.egg*
+
+# Editor temp files:
+*.swp
+*~
+
+# Sphinx docs:
+build
+
+# Logs:
+*.log
+# mac:
+*.DS_Store
+
+# Celery sch
+celerybeat-schedule
+
