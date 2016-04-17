@@ -1,13 +1,17 @@
 from django import forms
 from django.contrib.auth.models import User
 
+from oscar.core.loading import get_model
 from oscar.apps.customer.utils import normalise_email
-from oscar.apps.partner.models import Partner
+
+Partner = get_model('partner', 'Partner')
+Shop = get_model('partner', 'Shop')
 
 
 class GatewayForm(forms.Form):
     email = forms.EmailField()
     shop_name = forms.CharField()
+    full_name = forms.CharField()
 
     def clean_email(self):
         email = normalise_email(self.cleaned_data['email'])
@@ -19,7 +23,7 @@ class GatewayForm(forms.Form):
 
     def clean_shop_name(self):
         shop_name = self.cleaned_data['shop_name']
-        if Partner.objects.filter(code__exact=shop_name).exists():
+        if Shop.objects.filter(title__exact=shop_name).exists():
             raise forms.ValidationError(
                 "A Shop already exists with this name %s" % shop_name
             )
