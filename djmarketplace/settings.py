@@ -47,7 +47,16 @@ INSTALLED_APPS = [
 
     'compressor',
     'widget_tweaks',
-] + get_core_apps()
+
+    'apps.gateway',
+]
+
+INSTALLED_APPS = INSTALLED_APPS + get_core_apps([
+    'apps.partner',
+    'apps.catalogue',
+    'apps.dashboard',
+    'apps.dashboard.catalogue',
+    ])
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -69,7 +78,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            location('templates'),
             OSCAR_MAIN_TEMPLATE_DIR
         ],
         'APP_DIRS': True,
@@ -94,6 +103,8 @@ AUTHENTICATION_BACKENDS = (
     'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 WSGI_APPLICATION = 'djmarketplace.wsgi.application'
 

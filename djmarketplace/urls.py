@@ -9,4 +9,5 @@ urlpatterns = [
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include(application.urls)),
+    url(r'gateway/', include('apps.gateway.urls')),
 ]
