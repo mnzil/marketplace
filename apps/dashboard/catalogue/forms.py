@@ -25,7 +25,7 @@ class ProductClassSelectForm(CoreProductClassSelectForm):
             if not kwargs.get('initial') and len(qs) == 1:
                 self.fields['product_class'].initial = qs[0]
         else:
-            qs = self.fields['product_class'].queryset = ProductClass.objects.none()
+            qs = self.fields['product_class'].queryset = ProductClass.objects.all()
 
 
 class ProductClassForm(forms.ModelForm):
