@@ -3,8 +3,11 @@ class ShopMiddleware(object):
         if request.user and request.user.is_authenticated():
             shop_id = request.user.partners.all().values_list(
                 'shop_id',
-                flat=True)[0]
-            request.shop_id = shop_id
+                flat=True)
+            if shop_id:
+                request.shop_id = shop_id[0]
+            else:
+                request.shop_id = -1
         else:
             request.shop_id = -1
         return

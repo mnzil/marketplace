@@ -13,10 +13,13 @@ Product = get_model('catalogue', 'Product')
 
 
 def filter_products(queryset, user):
-    shop_id = user.partners.all().values_list(
-        'shop_id',
-        flat=True)[0]
-    queryset = queryset.filter(product_class__shop_id=shop_id).distinct()
+    try:
+        shop_id = user.partners.all().values_list(
+            'shop_id',
+            flat=True)[0]
+        queryset = queryset.filter(product_class__shop_id=shop_id).distinct()
+    except:
+        queryset = queryset.none()
     return queryset
 
 
