@@ -54,8 +54,11 @@ INSTALLED_APPS = [
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps([
     'apps.partner',
     'apps.catalogue',
+    'apps.offer',
     'apps.dashboard',
     'apps.dashboard.catalogue',
+    'apps.dashboard.offers',
+    'apps.dashboard.ranges',
     'apps.dashboard.partners'
     ])
 
