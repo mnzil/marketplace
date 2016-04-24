@@ -18,9 +18,8 @@ class ProductClassSelectForm(CoreProductClassSelectForm):
         super(ProductClassSelectForm, self).__init__(*args, **kwargs)
 
         if request is not None:
-            print request.user.partners.all().values_list('shop_id', flat=True)
             qs = self.fields['product_class'].queryset = ProductClass.objects.filter(
-                shop_id__in=request.user.partners.all().values_list('shop_id', flat=True))
+                shop_id=request.shop_id)
 
             if not kwargs.get('initial') and len(qs) == 1:
                 self.fields['product_class'].initial = qs[0]

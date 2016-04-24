@@ -1,14 +1,13 @@
 import logging
 
 from django.views import generic
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.core.mail import send_mail
 from django import http
 from django.core.urlresolvers import reverse
 from django.template.loader import get_template
 from django.template import Context
-from django.contrib.auth.models import Permission
 
 from . import forms
 from oscar.apps.customer.forms import generate_username
@@ -31,41 +30,42 @@ class GatewayView(generic.FormView):
         username = generate_username()
         password = generate_username()
 
-        user = self.create_dashboard_user(username, email, password, full_name, code)
+        user = self.create_dashboard_user(
+            username, email, password,
+            full_name, code)
         self.send_confirmation_email(email, user, password)
         logger.info("Created dashboard user #%d for %s",
                     user.id, email)
 
         messages.success(
             self.request,
-            "The credentials for a dashboard user have been sent to %s" % email)
+            "The credentials of a dashboard user have been sent to %s" % email)
         return http.HttpResponseRedirect(reverse('gateway'))
 
-    def create_dashboard_user(self, username, email, password, full_name, title):
+    def create_dashboard_user(self, username, email,
+                              password, full_name, title):
         user = User.objects.create_user(username, email, password)
-        permission = Permission.objects.get(name='Can access dashboard')
-        user.user_permissions.add(permission)
-        user.is_staff = False
+        group = Group.objects.get(name='FullDashboardAccess')
+        user.groups.add(group)
+        user.is_staff = True
         user.is_active = False
-
         try:
-            latest_shop = int(Shop.objects.latest('id')['id'])
+            latest_shop = int(Shop.objects.latest('id').id)
         except:
             latest_shop = 0
-        shop = Shop(latest_shop + 1, title=title)
+        shop = Shop(id=latest_shop + 1, title=title)
         shop.save()
 
         try:
-            latest_partner = Partner.objects.latest('id')['id']
+            latest_partner = int(Partner.objects.latest('id').id)
         except:
             latest_partner = 0
-        partner = Partner(latest_partner + 1, name=full_name)
+        partner = Partner(latest_partner + 1, name=full_name, shop_id=shop.id)
 
         user.save()
         partner.save()
 
         partner.users.add(user)
-        partner.shop.add(shop)
         return user
 
     def send_confirmation_email(self, email, user, password):

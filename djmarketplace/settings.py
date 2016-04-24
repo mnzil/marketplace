@@ -56,6 +56,7 @@ INSTALLED_APPS = INSTALLED_APPS + get_core_apps([
     'apps.catalogue',
     'apps.dashboard',
     'apps.dashboard.catalogue',
+    'apps.dashboard.partners'
     ])
 
 MIDDLEWARE_CLASSES = (
@@ -64,6 +65,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'apps.dashboard.middleware.ShopMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
