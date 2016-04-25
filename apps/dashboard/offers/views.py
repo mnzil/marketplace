@@ -1,37 +1,75 @@
+from django.shortcuts import get_object_or_404
 from oscar.apps.dashboard.offers.views import \
-    OfferListView as CoreOfferListView
+    OfferListView as CoreOfferListView, \
+    OfferBenefitView as CoreOfferBenefitView, \
+    OfferConditionView as CoreOfferConditionView, \
+    OfferWizardStepView as CoreOfferWizardStepView, \
+    OfferRestrictionsView as CoreOfferRestrictionsView, \
+    OfferDetailView as CoreOfferDetailView, \
+    OfferMetaDataView as CoreOfferMetaDataView, \
+    OfferDeleteView as CoreOfferDeleteView
+from oscar.core.loading import get_model
+
+ConditionalOffer = get_model('offer', 'ConditionalOffer')
 
 
 class OfferListView(CoreOfferListView):
     def get_queryset(self):
-        qs = self.model._default_manager.exclude(
-            offer_type=ConditionalOffer.VOUCHER)
-        qs = sort_queryset(qs, self.request,
-                           ['name', 'start_datetime', 'end_datetime',
-                            'num_applications', 'total_discount'])
+        return super(OfferListView, self).get_queryset().filter(
+            shop_id=self.request.shop_id)
 
-        self.description = _("All offers")
-        self.is_filtered = False
-        self.form = self.form_class(self.request.GET)
-        if not self.form.is_valid():
-            return qs
 
-        data = self.form.cleaned_data
+class OfferWizardStepView(CoreOfferWizardStepView):
+    def dispatch(self, request, *args, **kwargs):
+        if self.update:
+            print self.request.shop_id
+            self.offer = get_object_or_404(
+                ConditionalOffer,
+                pk=kwargs['pk'],
+                shop_id=self.request.shop_id)
+        return super(OfferWizardStepView, self).dispatch(request, *args,
+                                                         **kwargs)
 
-        if data['name']:
-            qs = qs.filter(name__icontains=data['name'])
-            self.description = _("Offers matching '%s'") % data['name']
-            self.is_filtered = True
-        if data['is_active']:
-            self.is_filtered = True
-            today = timezone.now()
-            qs = qs.filter(start_datetime__lte=today, end_datetime__gte=today)
+    def save_offer(self, offer):
+        offer.shop_id = self.request.shop_id
+        return super(OfferWizardStepView, self).save_offer(offer)
 
-        return qs
 
+class OfferBenefitView(OfferWizardStepView, CoreOfferBenefitView):
     def get_context_data(self, **kwargs):
-        ctx = super(OfferListView, self).get_context_data(**kwargs)
-        ctx['queryset_description'] = self.description
-        ctx['form'] = self.form
-        ctx['is_filtered'] = self.is_filtered
+        ctx = super(OfferBenefitView, self).get_context_data(**kwargs)
+        ctx['form'] = self.form_class(shop_id=self.request.shop_id)
         return ctx
+
+
+class OfferConditionView(OfferWizardStepView, CoreOfferConditionView):
+    def get_context_data(self, **kwargs):
+        ctx = super(OfferConditionView, self).get_context_data(**kwargs)
+        ctx['form'] = self.form_class(shop_id=self.request.shop_id)
+        return ctx
+
+
+class OfferRestrictionsView(OfferWizardStepView, CoreOfferRestrictionsView):
+    pass
+
+
+class OfferMetaDataView(OfferWizardStepView, CoreOfferMetaDataView):
+    pass
+
+
+class OfferDetailView(CoreOfferDetailView):
+    def dispatch(self, request, *args, **kwargs):
+        self.offer = get_object_or_404(
+            ConditionalOffer,
+            pk=kwargs['pk'],
+            shop_id=self.request.shop_id)
+        return super(OfferDetailView, self).dispatch(request, *args, **kwargs)
+
+
+class OfferDeleteView(CoreOfferDeleteView):
+    def get_object(self):
+        self.offer = get_object_or_404(
+            ConditionalOffer,
+            pk=self.kwargs.get('pk', None),
+            shop_id=self.request.shop_id)
+        return super(OfferDeleteView, self).get_object()
