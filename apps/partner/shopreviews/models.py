@@ -151,7 +151,7 @@ class ShopReview(models.Model):
         """
         Update total and delta votes
         """
-        result = self.votes.aggregate(
+        result = self.shopvotes.aggregate(
             score=Sum('delta'), total_votes=Count('id'))
         self.total_votes = result['total_votes'] or 0
         self.delta_votes = result['score'] or 0
@@ -164,7 +164,7 @@ class ShopReview(models.Model):
         """
         if not user.is_authenticated():
             return False, _(u"Only signed in users can vote")
-        vote = self.votes.model(review=self, user=user, delta=1)
+        vote = self.shopvotes.model(review=self, user=user, delta=1)
         try:
             vote.full_clean()
         except ValidationError as e:
@@ -179,7 +179,7 @@ class ShopVote(models.Model):
     * Only signed-in users can vote.
     * Each user can vote only once.
     """
-    review = models.ForeignKey(ShopReview, related_name='votes')
+    review = models.ForeignKey(ShopReview, related_name='shopvotes')
     user = models.ForeignKey(AUTH_USER_MODEL, related_name='shopreview_votes')
     UP, DOWN = 1, -1
     VOTE_CHOICES = (
@@ -193,8 +193,8 @@ class ShopVote(models.Model):
         app_label = 'shopreviews'
         ordering = ['-date_created']
         unique_together = (('user', 'review'),)
-        verbose_name = _('Vote')
-        verbose_name_plural = _('Votes')
+        verbose_name = _('ShopVote')
+        verbose_name_plural = _('ShopVotes')
 
     def __str__(self):
         return u"%s vote for %s" % (self.delta, self.review)
@@ -206,11 +206,11 @@ class ShopVote(models.Model):
         if not self.user.id:
             raise ValidationError(_(
                 "Only signed-in users can vote on reviews"))
-        previous_votes = self.review.votes.filter(user=self.user)
+        previous_votes = self.review.shopvotes.filter(user=self.user)
         if len(previous_votes) > 0:
             raise ValidationError(_(
                 "You can only vote once on a review"))
 
     def save(self, *args, **kwargs):
-        super(AbstractVote, self).save(*args, **kwargs)
+        super(ShopVote, self).save(*args, **kwargs)
         self.review.update_totals()

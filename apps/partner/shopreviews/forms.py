@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from oscar.core.loading import get_model
 
-Vote = get_model('reviews', 'vote')
+ShopVote = get_model('shopreviews', 'ShopVote')
 ShopReview = get_model('shopreviews', 'shopreview')
 
 
@@ -27,7 +27,7 @@ class ShopReviewForm(forms.ModelForm):
 class VoteForm(forms.ModelForm):
 
     class Meta:
-        model = Vote
+        model = ShopVote
         fields = ('delta',)
 
     def __init__(self, review, user, *args, **kwargs):
@@ -37,11 +37,11 @@ class VoteForm(forms.ModelForm):
 
     @property
     def is_up_vote(self):
-        return self.cleaned_data['delta'] == Vote.UP
+        return self.cleaned_data['delta'] == ShopVote.UP
 
     @property
     def is_down_vote(self):
-        return self.cleaned_data['delta'] == Vote.DOWN
+        return self.cleaned_data['delta'] == ShopVote.DOWN
 
 
 class SortReviewsForm(forms.Form):
