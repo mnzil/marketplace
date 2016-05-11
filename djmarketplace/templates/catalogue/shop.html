@@ -1,0 +1,71 @@
+{% extends "catalogue/browse.html" %}
+
+{% load display_tags %}
+{% load reviews_tags %}
+{% load i18n %}
+
+{% block title %}
+    {{ shop.title }} | {{ block.super }}
+{% endblock %}
+
+{% block description %}
+    {{ shop.description|default:""|striptags }}
+{% endblock %}
+
+{% block headertext %}{{ shop.title }}{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+        </li>
+        <li class="active">{{ shop.title }}</li>
+    </ul>
+{% endblock breadcrumbs %}
+
+{% block content %}
+    {% if shop.description %}
+        <div class="row">
+            <div class="col-sm-9"><p>{{ shop.description|safe }}</p></div>
+            {% if shop.image %}
+                <div class="col-sm-3"><img src="{{ shop.image.url }}" alt="{{ shop.title }}" class="img-responsive" /></div>
+            {% endif %}
+        </div>
+    {% endif %}
+    {{ block.super }}
+
+    {% iffeature "shopreviews" %}
+        {% block shop_review %}
+        <section>
+            <div id="reviews" class="sub-header">
+                {% if shop.num_approved_reviews > 3 %}
+                    <a href="{% url 'shop:shopreviews-list' shop_code=shop.code shop_pk=shop.id %}" class="btn pull-right">{% trans "See all reviews" %}</a>
+                {% endif %}
+                <h2>{% trans "Customer Reviews" %}</h2>
+            </div>
+
+            {% if shop.num_approved_reviews == 0 %}
+                <p>
+                    {% if shop|is_review_permitted:user %}
+                        {% url 'shop:shopreviews-add' shop_code=shop.code shop_pk=shop.id as add_review_url %}
+                            {% blocktrans %}This shop does not have any reviews yet -
+                            <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
+                        {% endblocktrans %}
+                    {% else %}
+                        {% trans "This shop does not have any reviews yet" %}.
+                    {% endif %}
+                </p>
+            {% else %}
+                <ol class="list-unstyled review-list">
+                    {% for review in shop.shopreviews.all|slice:":3" %}
+                        <li>
+                        {% include 'partner/review.html' %}
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </section>
+        {% endblock shop_review %}
+    {% endiffeature %}
+{% endblock %}
+

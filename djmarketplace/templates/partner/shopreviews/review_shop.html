@@ -1,0 +1,19 @@
+{% load thumbnail %}
+{% load staticfiles %}
+
+<div class="row">
+    <div class="col-sm-2">
+        <div class="image_container">
+            {% with image=shop.primary_image %}
+                {% thumbnail image "x155" upscale=False as thumb %}
+                    <img class="thumbnail" src="{{ thumb.url }}" alt="{{ shop.title }}"/>
+                {% endthumbnail %}
+            {% endwith %}
+        </div>
+    </div>
+    <div class="col-sm-10">
+        <h2><a href="{{ shop.get_absolute_url }}">{{ shop.title }}</a></h2>
+    </div>
+</div>
+
+<hr>

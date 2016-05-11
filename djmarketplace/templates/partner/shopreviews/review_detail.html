@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block title %}
+    {{ review.title }} | {% trans "Reviews" %} | {{ shop.title }} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+        </li>
+        <li class="active">{{ review.title }}</li>
+    </ul>
+{% endblock %}
+
+{% block headertext %}
+    {% trans "Customer reviews" %}
+{% endblock  %}
+
+{% block content %}
+    <section>
+        {% include 'partner/review.html' %}
+    </section>
+{% endblock %}
