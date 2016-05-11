@@ -175,3 +175,15 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
     },
 }
+
+
+from django.utils.translation import ugettext_lazy as _
+from oscar.defaults import *
+
+OSCAR_DASHBOARD_NAVIGATION += [
+    {
+        'label': _('Shop Details'),
+        'icon': 'icon-info',
+        'url_name': 'dashboard:shop-details',
+    },
+]
