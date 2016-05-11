@@ -12,9 +12,11 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 from oscar.defaults import *
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
 from oscar import get_core_apps
+from django.utils.translation import ugettext_lazy as _
 
 location = lambda x : os.path.join(os.path.dirname(os.path.realpath(__file__)), x)
 
@@ -177,8 +179,6 @@ HAYSTACK_CONNECTIONS = {
 }
 
 
-from django.utils.translation import ugettext_lazy as _
-from oscar.defaults import *
 
 OSCAR_DASHBOARD_NAVIGATION += [
     {
@@ -187,3 +187,5 @@ OSCAR_DASHBOARD_NAVIGATION += [
         'url_name': 'dashboard:shop-details',
     },
 ]
+
+sys.setrecursionlimit(10000)
