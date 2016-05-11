@@ -1,0 +1,40 @@
+{% extends 'dashboard/layout.html' %}
+{% load thumbnail %}
+{% load sorting_tags %}
+{% load i18n %}
+
+{% block body_class %}{{ block.super }} create-page partners{% endblock %}
+{% block title %}
+    {{ shop.title }} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+        </li>
+        <li class="active">{{ shop.title }}</li>
+    </ul>
+{% endblock %}
+
+{% block headertext %}{{ shop.title }}{% endblock %}
+
+{% block dashboard_content %}
+
+    <div class="row">
+        <div class="col-md-3">
+
+            {% with image=shop.primary_image %}
+                {% thumbnail image "300x300" upscale=False as thumb %}
+                    <img class="thumbnail" src="{{ thumb.url }}" alt="{{ shop.title }}"/>
+                {% endthumbnail %}
+            {% endwith %}
+        </div>
+        <div class="col-md-9">
+            <div class="table-header">
+                <h2>{{ title }}</h2>
+            </div>
+            {% include "dashboard/partials/form.html" with form=form class="well" %}
+        </div>
+    </div>
+{% endblock dashboard_content %}

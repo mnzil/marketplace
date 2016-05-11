@@ -1,7 +1,9 @@
 from django.contrib import messages
+from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
+from django.views import generic
 from oscar.views import sort_queryset
 from oscar.apps.dashboard.partners.views import \
     PartnerCreateView as CorePartnerCreateView, \
@@ -14,10 +16,13 @@ from oscar.apps.dashboard.partners.views import \
     PartnerUserUpdateView as CorePartnerUserUpdateView, \
     PartnerListView as CorePartnerListView
 from oscar.core.compat import get_user_model
-from oscar.core.loading import get_model
+from oscar.core.loading import get_model, get_class
 
 User = get_user_model()
 Partner = get_model('partner', 'Partner')
+Shop = get_model('partner', 'Shop')
+
+ShopDetailsForm = get_class('dashboard.partners.forms', 'ShopDetailsForm')
 
 
 class PartnerCreateView(CorePartnerCreateView):
@@ -142,3 +147,29 @@ class PartnerUserUpdateView(CorePartnerUserUpdateView):
         return get_object_or_404(User,
                                  pk=self.kwargs['user_pk'],
                                  partners__pk=self.kwargs['partner_pk'])
+
+
+class ShopDetailsUpdateView(generic.UpdateView):
+    template_name = 'dashboard/partners/shop-details.html'
+    form_class = ShopDetailsForm
+    success_url = reverse_lazy('dashboard:shop-details')
+
+    def get_object(self):
+        self.shop = get_object_or_404(Shop, pk=self.request.shop_id)
+        return self.shop
+
+    def get_initial(self):
+        return {'name': self.shop}
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ShopDetailsUpdateView, self).get_context_data(**kwargs)
+        ctx['title'] = self.shop.title
+        ctx['includes_files'] = True
+        return ctx
+
+    def form_valid(self, form):
+        messages.success(
+            self.request, _("Shop Details were updated successfully."))
+        self.shop.title = form.cleaned_data['title']
+        self.shop.save()
+        return super(ShopDetailsUpdateView, self).form_valid(form)
