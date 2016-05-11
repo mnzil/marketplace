@@ -56,6 +56,18 @@
                     {% endif %}
                 </p>
             {% else %}
+                <p>
+                    {% if shop|is_review_permitted:user %}
+                        {% url 'shop:shopreviews-add' shop_code=shop.code shop_pk=shop.id as add_review_url %}
+                            <i class="icon-info"></i> 
+                            <i>
+                            {% blocktrans %}
+                                Have experience with this Shop
+                                <a href="{{ add_review_url }}#addreview">Add your review now</a>.
+                            {% endblocktrans %}
+                            </i>
+                    {% endif %}
+                </p>
                 <ol class="list-unstyled review-list">
                     {% for review in shop.shopreviews.all|slice:":3" %}
                         <li>
