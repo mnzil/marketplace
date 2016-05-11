@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
 
     'apps.gateway',
+    'apps.partner.shopreviews',
 ]
 
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps([
@@ -59,6 +60,7 @@ INSTALLED_APPS = INSTALLED_APPS + get_core_apps([
     'apps.dashboard.catalogue',
     'apps.dashboard.offers',
     'apps.dashboard.ranges',
+    'apps.dashboard.reviews',
     'apps.dashboard.partners'
     ])
 
